@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Usage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-layer"></div>
+
+    <button id="menuToggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <button id="brandHome" class="brand-center" aria-label="Go to home">
+      <div class="brand-mark" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <span class="brand-name">AiUsage</span>
+    </button>
+
+    <div class="top-actions">
+      <button id="loginOpen" class="login-open">Login</button>
+    </div>
+
+    <aside id="sidebar" class="sidebar" aria-hidden="true">
+      <div class="sidebar-head">
+        <p class="mini-label">AI Usage</p>
+        <h2>Control Panel</h2>
+      </div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-item active" data-page="home">Home</button>
+        <button class="nav-item" data-page="accounts">AI Account</button>
+        <button class="nav-item" data-page="calendar">Usage Calendar</button>
+        <button class="nav-item" data-page="about">About Us</button>
+      </nav>
+      <div class="sidebar-theme">
+        <p class="mini-label">Appearance</p>
+        <button id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle theme">Light</button>
+      </div>
+    </aside>
+
+    <main class="shell">
+      <section class="page active" data-page="home">
+        <header class="hero">
+          <p class="mini-label">Professional AI usage tracking</p>
+          <h1>Track all your AI usage in one place.</h1>
+          <p>
+            Collect usage from multiple accounts, click your daily activity, and keep a clean overview of your AI workflow.
+          </p>
+        </header>
+
+        <div class="home-grid tight">
+          <article class="card glow-card">
+            <h3>Connected Accounts</h3>
+            <strong id="connectedCount">0</strong>
+            <p>Number of AI accounts currently integrated.</p>
+          </article>
+          <article class="card">
+            <h3>Usage This Month</h3>
+            <strong id="homeUsedDays">0 days</strong>
+            <p>Marked days in the current month.</p>
+          </article>
+          <article class="card">
+            <h3>Total Prompt Volume</h3>
+            <strong id="homePromptTotal">0</strong>
+            <p>Combined prompt count from all entries.</p>
+          </article>
+        </div>
+
+        <section class="card home-calendar-card">
+          <header class="section-head calendar-head-row">
+            <div>
+              <p class="mini-label">Daily tracker</p>
+              <h2>Home Calendar</h2>
+            </div>
+            <div class="nav-pair">
+              <button id="homePrevMonth" aria-label="Previous month">&#10094;</button>
+              <strong id="homeMonthLabel"></strong>
+              <button id="homeNextMonth" aria-label="Next month">&#10095;</button>
+            </div>
+          </header>
+          <div id="homeWeekdays" class="weekday-row"></div>
+          <div id="homeMonthCalendar" class="month-calendar-big"></div>
+        </section>
+
+        <section class="support-section card">
+          <div class="support-head">
+            <p class="mini-label">Ecosystem support</p>
+            <h3>We support a wide AI stack</h3>
+            <p>As you scale your workflow, keep everything in one usage system.</p>
+          </div>
+
+          <div class="providers-band" aria-label="Supported AI providers">
+            <div class="providers-track">
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" />OpenAI</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="Claude" />Claude</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini" />Gemini</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="Perplexity" />Perplexity</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=copilot.microsoft.com&sz=64" alt="Copilot" />Copilot</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=meta.ai&sz=64" alt="Meta AI" />Meta AI</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=x.ai&sz=64" alt="xAI" />xAI</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" />DeepSeek</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=mistral.ai&sz=64" alt="Mistral" />Mistral</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=poe.com&sz=64" alt="Poe" />Poe</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=runwayml.com&sz=64" alt="Runway" />Runway</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="Notion AI" />Notion AI</span>
+            </div>
+            <div class="providers-track" aria-hidden="true">
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="" />OpenAI</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="" />Claude</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="" />Gemini</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="" />Perplexity</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=copilot.microsoft.com&sz=64" alt="" />Copilot</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=meta.ai&sz=64" alt="" />Meta AI</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=x.ai&sz=64" alt="" />xAI</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="" />DeepSeek</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=mistral.ai&sz=64" alt="" />Mistral</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=poe.com&sz=64" alt="" />Poe</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=runwayml.com&sz=64" alt="" />Runway</span>
+              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="" />Notion AI</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" data-page="accounts">
+        <header class="section-head">
+          <p class="mini-label">AI Account</p>
+          <h2>Integrate your providers + usage trend</h2>
+        </header>
+
+        <div class="account-grid">
+          <article class="card provider-card" data-provider="OpenAI">
+            <div>
+              <h3>OpenAI</h3>
+              <p>Connect your OpenAI key to enable account tracking.</p>
+            </div>
+            <div class="provider-actions">
+              <input type="password" data-key-input="OpenAI" placeholder="OpenAI API key" />
+              <button class="action-btn" data-connect="OpenAI">Connect</button>
+              <button class="remove-key-btn" data-remove-key="OpenAI" title="Remove API key" aria-label="Remove OpenAI API key">&#128465;</button>
+            </div>
+            <span class="status-pill" data-status="OpenAI">Not connected</span>
+          </article>
+
+          <article class="card provider-card" data-provider="Claude">
+            <div>
+              <h3>Claude</h3>
+              <p>Integrate Claude usage and keep analytics in one dashboard.</p>
+            </div>
+            <div class="provider-actions">
+              <input type="password" data-key-input="Claude" placeholder="Claude API key" />
+              <button class="action-btn" data-connect="Claude">Connect</button>
+              <button class="remove-key-btn" data-remove-key="Claude" title="Remove API key" aria-label="Remove Claude API key">&#128465;</button>
+            </div>
+            <span class="status-pill" data-status="Claude">Not connected</span>
+          </article>
+        </div>
+
+        <article class="card chart-card">
+          <div class="chart-top">
+            <h3>Usage Trend (sample OpenAI stats)</h3>
+            <div class="range-pills">
+              <button class="range-pill active" data-range="30">Last 30 days</button>
+              <button class="range-pill" data-range="10">Last 10 days</button>
+              <button class="range-pill" data-range="7">Last week</button>
+            </div>
+          </div>
+          <div id="usageChart" class="usage-chart" aria-label="Usage trend line chart"></div>
+          <div class="chart-foot" id="chartFoot"></div>
+        </article>
+      </section>
+
+      <section class="page" data-page="calendar">
+        <header class="section-head calendar-head-row">
+          <div>
+            <p class="mini-label">Usage Calendar</p>
+            <h2>Week / Month / Year view</h2>
+          </div>
+          <div class="calendar-controls">
+            <div class="mode-pills">
+              <button class="mode-pill active" data-view="week">Week</button>
+              <button class="mode-pill" data-view="month">Month</button>
+              <button class="mode-pill" data-view="year">Year</button>
+            </div>
+            <div class="nav-pair">
+              <button id="usagePrev" aria-label="Previous">&#10094;</button>
+              <strong id="usageLabel"></strong>
+              <button id="usageNext" aria-label="Next">&#10095;</button>
+            </div>
+          </div>
+        </header>
+
+        <article class="card usage-frame-card">
+          <div id="usageCalendarFrame" class="usage-calendar-frame"></div>
+        </article>
+        <article class="card usage-bar-card">
+          <h3>Daily Usage Bars</h3>
+          <div id="usageBarChart" class="usage-bar-chart" aria-label="Daily usage bar chart"></div>
+        </article>
+
+        <div class="calendar-layout dense stats-only">
+          <article class="card stats-card">
+            <h3>Usage Stats</h3>
+            <div class="stat-line"><span>Used days (month)</span><strong id="usedDays">0</strong></div>
+            <div class="stat-line"><span>Used days (year)</span><strong id="usedYearDays">0</strong></div>
+            <div class="stat-line"><span>Entries</span><strong id="entryCount">0</strong></div>
+            <div class="stat-line"><span>Total prompts</span><strong id="promptTotal">0</strong></div>
+            <div class="stat-line"><span>Total minutes</span><strong id="minuteTotal">0</strong></div>
+          </article>
+        </div>
+
+        <article class="card usage-entry-card">
+          <h3>Add Usage Entry</h3>
+          <form id="usageForm" class="usage-form">
+            <input name="provider" type="text" placeholder="Provider (OpenAI / Claude / Gemini)" required />
+            <input name="account" type="text" placeholder="Account label or email" required />
+            <input name="prompts" type="number" min="0" placeholder="Prompts" required />
+            <input name="minutes" type="number" min="0" placeholder="Minutes" required />
+            <button type="submit">Add</button>
+          </form>
+          <div id="accountList" class="entry-list"></div>
+        </article>
+      </section>
+
+      <section class="page" data-page="about">
+        <header class="section-head">
+          <p class="mini-label">About Us</p>
+          <h2>Built with purpose by Himanshu Bhusari</h2>
+        </header>
+
+        <article class="card about-card interactive">
+          <p id="aboutMessage" class="about-message">
+            AiUsage helps you build a simple daily habit of tracking AI work, across every account you use.
+          </p>
+          <div class="about-chips">
+            <button class="about-chip active" data-about="mission">Mission</button>
+            <button class="about-chip" data-about="builder">Builder</button>
+            <button class="about-chip" data-about="vision">Vision</button>
+          </div>
+          <div id="aboutPanel" class="about-panel">
+            <h4>Mission</h4>
+            <p>Give users one clean place to track AI usage without complex setup.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <section id="loginModal" class="login-modal" aria-hidden="true">
+      <div class="login-card">
+        <button id="loginClose" class="close-btn" aria-label="Close login">&#10005;</button>
+        <p class="mini-label">Secure login</p>
+        <h3>Sign in to AiUsage</h3>
+        <form class="login-form" id="loginForm">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="you@company.com" required />
+          <button type="submit" class="primary-login">Continue with Email</button>
+        </form>
+        <div class="divider"><span>or continue with</span></div>
+        <div class="social-logins">
+          <button type="button">Google</button>
+          <button type="button">Apple</button>
+          <button type="button">Passkey</button>
+        </div>
+      </div>
+    </section>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
