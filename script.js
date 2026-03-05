@@ -1,5 +1,6 @@
 const STORAGE_KEY = "aiUsageHub.v5";
 const THEME_KEY = "aiUsage.theme";
+const APP_VERSION = "2.0.0";
 
 const ABOUT_CONTENT = {
   mission: {
