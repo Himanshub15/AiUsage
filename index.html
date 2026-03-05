@@ -3,18 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Usage</title>
+    <title>AiUsage — Track Your AI Workflow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="bg-layer"></div>
+    <div class="grain-overlay" aria-hidden="true"></div>
 
+    <!-- Top Chrome -->
     <button id="menuToggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -32,56 +34,139 @@
       <button id="loginOpen" class="login-open">Login</button>
     </div>
 
+    <!-- Sidebar -->
     <aside id="sidebar" class="sidebar" aria-hidden="true">
       <div class="sidebar-head">
         <p class="mini-label">AI Usage</p>
         <h2>Control Panel</h2>
       </div>
       <nav class="nav-list" aria-label="Main navigation">
-        <button class="nav-item active" data-page="home">Home</button>
-        <button class="nav-item" data-page="accounts">AI Account</button>
-        <button class="nav-item" data-page="calendar">Usage Calendar</button>
-        <button class="nav-item" data-page="about">About Us</button>
+        <button class="nav-item active" data-page="home">
+          <span class="nav-icon">⌂</span> Home
+        </button>
+        <button class="nav-item" data-page="accounts">
+          <span class="nav-icon">⚡</span> AI Account
+        </button>
+        <button class="nav-item" data-page="calendar">
+          <span class="nav-icon">▦</span> Usage Calendar
+        </button>
+        <button class="nav-item" data-page="about">
+          <span class="nav-icon">◉</span> About
+        </button>
       </nav>
-      <div class="sidebar-theme">
-        <p class="mini-label">Appearance</p>
-        <button id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle theme">Light</button>
+      <div class="sidebar-footer">
+        <div class="sidebar-theme">
+          <p class="mini-label">Appearance</p>
+          <button id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle theme">Light</button>
+        </div>
+        <div class="sidebar-shortcut-hint">
+          <span class="key-hint">⌘ T</span> Theme &nbsp; <span class="key-hint">⌘ K</span> Navigate
+        </div>
       </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="shell">
-      <section class="page active" data-page="home">
-        <header class="hero">
-          <p class="mini-label">Professional AI usage tracking</p>
-          <h1>Track all your AI usage in one place.</h1>
-          <p>
-            Collect usage from multiple accounts, click your daily activity, and keep a clean overview of your AI workflow.
-          </p>
-        </header>
 
-        <div class="home-grid tight">
-          <article class="card glow-card">
-            <h3>Connected Accounts</h3>
-            <strong id="connectedCount">0</strong>
-            <p>Number of AI accounts currently integrated.</p>
+      <!-- ======== HOME PAGE ======== -->
+      <section class="page active" data-page="home">
+
+        <!-- Greeting Bar -->
+        <div class="greeting-bar">
+          <div class="greeting-left">
+            <p class="greeting-time" id="greetingText">Good evening</p>
+            <h1 class="greeting-headline">Your AI Command Center</h1>
+            <p class="greeting-sub">Track usage across every provider. Click days. Build streaks.</p>
+          </div>
+          <div class="streak-badge" id="streakBadge" title="Consecutive days of AI usage">
+            <span class="streak-fire">🔥</span>
+            <span class="streak-count" id="streakCount">0</span>
+            <span class="streak-label">day streak</span>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-cyan">
+            <div class="kpi-accent"></div>
+            <div class="kpi-body">
+              <span class="kpi-icon">⚡</span>
+              <div class="kpi-data">
+                <span class="kpi-value" id="connectedCount" data-target="0">0</span>
+                <span class="kpi-label">Connected Accounts</span>
+              </div>
+            </div>
           </article>
-          <article class="card">
-            <h3>Usage This Month</h3>
-            <strong id="homeUsedDays">0 days</strong>
-            <p>Marked days in the current month.</p>
+          <article class="kpi-card kpi-green">
+            <div class="kpi-accent"></div>
+            <div class="kpi-body">
+              <span class="kpi-icon">📅</span>
+              <div class="kpi-data">
+                <span class="kpi-value" id="homeUsedDays" data-target="0">0</span>
+                <span class="kpi-label">Days Used This Month</span>
+              </div>
+            </div>
           </article>
-          <article class="card">
-            <h3>Total Prompt Volume</h3>
-            <strong id="homePromptTotal">0</strong>
-            <p>Combined prompt count from all entries.</p>
+          <article class="kpi-card kpi-purple">
+            <div class="kpi-accent"></div>
+            <div class="kpi-body">
+              <span class="kpi-icon">💬</span>
+              <div class="kpi-data">
+                <span class="kpi-value" id="homePromptTotal" data-target="0">0</span>
+                <span class="kpi-label">Total Prompts</span>
+              </div>
+            </div>
+          </article>
+          <article class="kpi-card kpi-amber">
+            <div class="kpi-accent"></div>
+            <div class="kpi-body">
+              <span class="kpi-icon">⏱</span>
+              <div class="kpi-data">
+                <span class="kpi-value" id="homeMinuteTotal" data-target="0">0</span>
+                <span class="kpi-label">Total Minutes</span>
+              </div>
+            </div>
           </article>
         </div>
 
+        <!-- Two-Column: Heatmap + Provider Breakdown -->
+        <div class="home-two-col">
+          <section class="card heatmap-card">
+            <header class="card-header">
+              <div>
+                <p class="mini-label">Activity Overview</p>
+                <h2>Usage Heatmap</h2>
+              </div>
+              <div class="heatmap-legend">
+                <span class="legend-label">Less</span>
+                <span class="heatmap-swatch" data-level="0"></span>
+                <span class="heatmap-swatch" data-level="1"></span>
+                <span class="heatmap-swatch" data-level="2"></span>
+                <span class="heatmap-swatch" data-level="3"></span>
+                <span class="legend-label">More</span>
+              </div>
+            </header>
+            <div id="heatmapGrid" class="heatmap-grid"></div>
+            <p class="heatmap-summary" id="heatmapSummary"></p>
+          </section>
+
+          <section class="card breakdown-card">
+            <header class="card-header">
+              <p class="mini-label">By Provider</p>
+              <h2>Usage Breakdown</h2>
+            </header>
+            <div id="providerBreakdown" class="breakdown-list">
+              <p class="empty-state">Add usage entries to see provider breakdown.</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- Home Calendar -->
         <section class="card home-calendar-card">
-          <header class="section-head calendar-head-row">
+          <header class="card-header calendar-head-row">
             <div>
-              <p class="mini-label">Daily tracker</p>
-              <h2>Home Calendar</h2>
+              <p class="mini-label">Daily Tracker</p>
+              <h2>Monthly Calendar</h2>
             </div>
             <div class="nav-pair">
               <button id="homePrevMonth" aria-label="Previous month">&#10094;</button>
@@ -93,13 +178,12 @@
           <div id="homeMonthCalendar" class="month-calendar-big"></div>
         </section>
 
+        <!-- Provider Marquee -->
         <section class="support-section card">
           <div class="support-head">
-            <p class="mini-label">Ecosystem support</p>
-            <h3>We support a wide AI stack</h3>
-            <p>As you scale your workflow, keep everything in one usage system.</p>
+            <p class="mini-label">Ecosystem</p>
+            <h3>Supported AI Providers</h3>
           </div>
-
           <div class="providers-band" aria-label="Supported AI providers">
             <div class="providers-track">
               <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" />OpenAI</span>
@@ -133,47 +217,58 @@
         </section>
       </section>
 
+      <!-- ======== ACCOUNTS PAGE ======== -->
       <section class="page" data-page="accounts">
-        <header class="section-head">
+        <header class="page-header">
           <p class="mini-label">AI Account</p>
-          <h2>Integrate your providers + usage trend</h2>
+          <h2>Integrate your providers</h2>
+          <p class="page-desc">Connect API keys to enable account-level tracking and real usage data.</p>
         </header>
 
         <div class="account-grid">
           <article class="card provider-card" data-provider="OpenAI">
-            <div>
-              <h3>OpenAI</h3>
-              <p>Connect your OpenAI key to enable account tracking.</p>
+            <div class="provider-top">
+              <img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="" class="provider-icon" />
+              <div>
+                <h3>OpenAI</h3>
+                <p>GPT-4, DALL-E, Whisper</p>
+              </div>
+              <span class="status-pill" data-status="OpenAI">Not connected</span>
             </div>
             <div class="provider-actions">
-              <input type="password" data-key-input="OpenAI" placeholder="OpenAI API key" />
+              <input type="password" data-key-input="OpenAI" placeholder="sk-..." />
               <button class="action-btn" data-connect="OpenAI">Connect</button>
-              <button class="remove-key-btn" data-remove-key="OpenAI" title="Remove API key" aria-label="Remove OpenAI API key">&#128465;</button>
+              <button class="remove-key-btn" data-remove-key="OpenAI" title="Remove API key" aria-label="Remove OpenAI API key">✕</button>
             </div>
-            <span class="status-pill" data-status="OpenAI">Not connected</span>
           </article>
 
           <article class="card provider-card" data-provider="Claude">
-            <div>
-              <h3>Claude</h3>
-              <p>Integrate Claude usage and keep analytics in one dashboard.</p>
+            <div class="provider-top">
+              <img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="" class="provider-icon" />
+              <div>
+                <h3>Claude</h3>
+                <p>Claude 4, Haiku, Sonnet, Opus</p>
+              </div>
+              <span class="status-pill" data-status="Claude">Not connected</span>
             </div>
             <div class="provider-actions">
-              <input type="password" data-key-input="Claude" placeholder="Claude API key" />
+              <input type="password" data-key-input="Claude" placeholder="sk-ant-..." />
               <button class="action-btn" data-connect="Claude">Connect</button>
-              <button class="remove-key-btn" data-remove-key="Claude" title="Remove API key" aria-label="Remove Claude API key">&#128465;</button>
+              <button class="remove-key-btn" data-remove-key="Claude" title="Remove API key" aria-label="Remove Claude API key">✕</button>
             </div>
-            <span class="status-pill" data-status="Claude">Not connected</span>
           </article>
         </div>
 
         <article class="card chart-card">
           <div class="chart-top">
-            <h3>Usage Trend (sample OpenAI stats)</h3>
+            <div>
+              <p class="mini-label">Trend</p>
+              <h3>Usage Over Time</h3>
+            </div>
             <div class="range-pills">
-              <button class="range-pill active" data-range="30">Last 30 days</button>
-              <button class="range-pill" data-range="10">Last 10 days</button>
-              <button class="range-pill" data-range="7">Last week</button>
+              <button class="range-pill active" data-range="30">30d</button>
+              <button class="range-pill" data-range="10">10d</button>
+              <button class="range-pill" data-range="7">7d</button>
             </div>
           </div>
           <div id="usageChart" class="usage-chart" aria-label="Usage trend line chart"></div>
@@ -181,11 +276,12 @@
         </article>
       </section>
 
+      <!-- ======== CALENDAR PAGE ======== -->
       <section class="page" data-page="calendar">
-        <header class="section-head calendar-head-row">
+        <header class="page-header calendar-head-row">
           <div>
             <p class="mini-label">Usage Calendar</p>
-            <h2>Week / Month / Year view</h2>
+            <h2>Week / Month / Year</h2>
           </div>
           <div class="calendar-controls">
             <div class="mode-pills">
@@ -209,7 +305,7 @@
           <div id="usageBarChart" class="usage-bar-chart" aria-label="Daily usage bar chart"></div>
         </article>
 
-        <div class="calendar-layout dense stats-only">
+        <div class="calendar-bottom-grid">
           <article class="card stats-card">
             <h3>Usage Stats</h3>
             <div class="stat-line"><span>Used days (month)</span><strong id="usedDays">0</strong></div>
@@ -218,25 +314,27 @@
             <div class="stat-line"><span>Total prompts</span><strong id="promptTotal">0</strong></div>
             <div class="stat-line"><span>Total minutes</span><strong id="minuteTotal">0</strong></div>
           </article>
-        </div>
 
-        <article class="card usage-entry-card">
-          <h3>Add Usage Entry</h3>
-          <form id="usageForm" class="usage-form">
-            <input name="provider" type="text" placeholder="Provider (OpenAI / Claude / Gemini)" required />
-            <input name="account" type="text" placeholder="Account label or email" required />
-            <input name="prompts" type="number" min="0" placeholder="Prompts" required />
-            <input name="minutes" type="number" min="0" placeholder="Minutes" required />
-            <button type="submit">Add</button>
-          </form>
-          <div id="accountList" class="entry-list"></div>
-        </article>
+          <article class="card usage-entry-card">
+            <h3>Add Usage Entry</h3>
+            <form id="usageForm" class="usage-form">
+              <input name="provider" type="text" placeholder="Provider (OpenAI / Claude / Gemini)" required />
+              <input name="account" type="text" placeholder="Account label or email" required />
+              <input name="prompts" type="number" min="0" placeholder="Prompts" required />
+              <input name="minutes" type="number" min="0" placeholder="Minutes" required />
+              <button type="submit">+ Add Entry</button>
+            </form>
+            <div id="accountList" class="entry-list"></div>
+          </article>
+        </div>
       </section>
 
+      <!-- ======== ABOUT PAGE ======== -->
       <section class="page" data-page="about">
-        <header class="section-head">
-          <p class="mini-label">About Us</p>
-          <h2>Built with purpose by Himanshu Bhusari</h2>
+        <header class="page-header">
+          <p class="mini-label">About</p>
+          <h2>Built by Himanshu Bhusari</h2>
+          <p class="page-desc">A focused tool for tracking daily AI usage across every provider you work with.</p>
         </header>
 
         <article class="card about-card interactive">
@@ -256,15 +354,35 @@
       </section>
     </main>
 
+    <!-- Quick Add FAB -->
+    <button id="quickAddBtn" class="fab" title="Quick add usage entry" aria-label="Quick add usage">
+      <span class="fab-icon">+</span>
+    </button>
+
+    <!-- Quick Add Modal -->
+    <section id="quickAddModal" class="quick-add-modal" aria-hidden="true">
+      <div class="quick-add-card">
+        <button id="quickAddClose" class="close-btn" aria-label="Close">✕</button>
+        <h3>Quick Add Usage</h3>
+        <form id="quickAddForm" class="quick-add-form">
+          <input name="provider" type="text" placeholder="Provider" required />
+          <input name="prompts" type="number" min="0" placeholder="Prompts" required />
+          <input name="minutes" type="number" min="0" placeholder="Minutes" required />
+          <button type="submit">Add & Mark Today</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Login Modal -->
     <section id="loginModal" class="login-modal" aria-hidden="true">
       <div class="login-card">
-        <button id="loginClose" class="close-btn" aria-label="Close login">&#10005;</button>
+        <button id="loginClose" class="close-btn" aria-label="Close login">✕</button>
         <p class="mini-label">Secure login</p>
         <h3>Sign in to AiUsage</h3>
         <form class="login-form" id="loginForm">
           <label for="loginEmail">Email</label>
           <input id="loginEmail" type="email" placeholder="you@company.com" required />
-          <button type="submit" class="primary-login">Continue with Email</button>
+          <button type="submit" class="primary-btn">Continue with Email</button>
         </form>
         <div class="divider"><span>or continue with</span></div>
         <div class="social-logins">

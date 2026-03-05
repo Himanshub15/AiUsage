@@ -52,9 +52,17 @@ const refs = {
   loginModal: document.getElementById("loginModal"),
   loginForm: document.getElementById("loginForm"),
 
+  greetingText: document.getElementById("greetingText"),
+  streakCount: document.getElementById("streakCount"),
+  streakBadge: document.getElementById("streakBadge"),
   connectedCount: document.getElementById("connectedCount"),
   homeUsedDays: document.getElementById("homeUsedDays"),
   homePromptTotal: document.getElementById("homePromptTotal"),
+  homeMinuteTotal: document.getElementById("homeMinuteTotal"),
+
+  heatmapGrid: document.getElementById("heatmapGrid"),
+  heatmapSummary: document.getElementById("heatmapSummary"),
+  providerBreakdown: document.getElementById("providerBreakdown"),
 
   homePrevMonth: document.getElementById("homePrevMonth"),
   homeNextMonth: document.getElementById("homeNextMonth"),
@@ -89,6 +97,11 @@ const refs = {
   aboutMessage: document.getElementById("aboutMessage"),
   aboutPanel: document.getElementById("aboutPanel"),
   aboutChips: [...document.querySelectorAll(".about-chip")],
+
+  quickAddBtn: document.getElementById("quickAddBtn"),
+  quickAddModal: document.getElementById("quickAddModal"),
+  quickAddClose: document.getElementById("quickAddClose"),
+  quickAddForm: document.getElementById("quickAddForm"),
 };
 
 init();
@@ -96,6 +109,7 @@ init();
 function init() {
   loadState();
   applyTheme();
+  setGreeting();
   bindNavigation();
   bindTheme();
   bindLoginModal();
@@ -105,10 +119,202 @@ function init() {
   bindProviderConnections();
   bindChartRange();
   bindAboutInteraction();
+  bindQuickAdd();
   renderWeekdayHeader();
   renderAll();
 }
 
+/* ======== GREETING ======== */
+function setGreeting() {
+  const hour = new Date().getHours();
+  let greeting = "Good evening";
+  if (hour < 12) greeting = "Good morning";
+  else if (hour < 17) greeting = "Good afternoon";
+  if (refs.greetingText) refs.greetingText.textContent = greeting;
+}
+
+/* ======== STREAK ======== */
+function calculateStreak() {
+  let streak = 0;
+  const today = new Date();
+  const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  while (true) {
+    const key = dateKeyFromDate(d);
+    if (state.usageDays[key]) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function renderStreak() {
+  const streak = calculateStreak();
+  if (refs.streakCount) refs.streakCount.textContent = String(streak);
+  if (refs.streakBadge) {
+    refs.streakBadge.style.opacity = streak > 0 ? "1" : "0.5";
+  }
+}
+
+/* ======== HEATMAP ======== */
+function renderHeatmap() {
+  if (!refs.heatmapGrid) return;
+
+  const today = new Date();
+  const totalDays = 182; // ~6 months
+  const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - totalDays + 1);
+
+  let html = "";
+  let activeDays = 0;
+
+  for (let i = 0; i < totalDays; i++) {
+    const d = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
+    const key = dateKeyFromDate(d);
+    const isToday = key === dateKeyFromDate(today);
+    const level = getActivityLevel(key);
+    if (level > 0) activeDays++;
+
+    const todayClass = isToday ? " today" : "";
+    const tooltip = `${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+    html += `<div class="heatmap-cell${todayClass}" data-level="${level}" data-date="${key}" title="${tooltip}"></div>`;
+  }
+
+  refs.heatmapGrid.innerHTML = html;
+
+  // Click to toggle days on heatmap
+  refs.heatmapGrid.querySelectorAll(".heatmap-cell").forEach((cell) => {
+    cell.addEventListener("click", () => {
+      const key = cell.dataset.date;
+      toggleDay(key, !state.usageDays[key]);
+      persist();
+      renderAll();
+    });
+  });
+
+  if (refs.heatmapSummary) {
+    refs.heatmapSummary.textContent = `${activeDays} active days in the last 6 months`;
+  }
+}
+
+function getActivityLevel(dateKey) {
+  const entryCount = state.entries.filter(
+    (e) => e.createdAt && e.createdAt.startsWith(dateKey)
+  ).length;
+  if (entryCount >= 4) return 3;
+  if (entryCount >= 2) return 2;
+  if (entryCount >= 1) return 1;
+  if (state.usageDays[dateKey]) return 1;
+  return 0;
+}
+
+/* ======== PROVIDER BREAKDOWN ======== */
+function renderProviderBreakdown() {
+  if (!refs.providerBreakdown) return;
+
+  const providerMap = {};
+  state.entries.forEach((entry) => {
+    const name = entry.provider.trim();
+    if (!providerMap[name]) providerMap[name] = { prompts: 0, minutes: 0, count: 0 };
+    providerMap[name].prompts += entry.prompts;
+    providerMap[name].minutes += entry.minutes;
+    providerMap[name].count += 1;
+  });
+
+  const providers = Object.entries(providerMap)
+    .map(([name, data]) => ({ name, ...data }))
+    .sort((a, b) => b.prompts - a.prompts);
+
+  if (providers.length === 0) {
+    refs.providerBreakdown.innerHTML = '<p class="empty-state">Add usage entries to see breakdown.</p>';
+    return;
+  }
+
+  const maxPrompts = Math.max(1, ...providers.map((p) => p.prompts));
+
+  refs.providerBreakdown.innerHTML = providers
+    .map((p) => {
+      const pct = Math.round((p.prompts / maxPrompts) * 100);
+      return `
+        <div class="breakdown-row">
+          <span class="breakdown-name">${escapeHtml(p.name)}</span>
+          <div class="breakdown-bar-bg">
+            <div class="breakdown-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <span class="breakdown-count">${p.prompts} prompts</span>
+        </div>`;
+    })
+    .join("");
+}
+
+/* ======== ANIMATED COUNTERS ======== */
+function animateCounter(element, target) {
+  if (!element) return;
+  const duration = 600;
+  const start = performance.now();
+  const from = 0;
+
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const current = Math.round(from + (target - from) * eased);
+    element.textContent = String(current);
+    if (progress < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+}
+
+/* ======== QUICK ADD ======== */
+function bindQuickAdd() {
+  if (!refs.quickAddBtn) return;
+
+  refs.quickAddBtn.addEventListener("click", () => {
+    refs.quickAddModal.classList.add("open");
+    refs.quickAddModal.setAttribute("aria-hidden", "false");
+  });
+
+  refs.quickAddClose.addEventListener("click", closeQuickAdd);
+
+  refs.quickAddModal.addEventListener("click", (event) => {
+    if (event.target === refs.quickAddModal) closeQuickAdd();
+  });
+
+  refs.quickAddForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(refs.quickAddForm);
+    const provider = String(data.get("provider") || "").trim();
+    const prompts = Number(data.get("prompts"));
+    const minutes = Number(data.get("minutes"));
+
+    if (!provider || Number.isNaN(prompts) || Number.isNaN(minutes)) return;
+
+    state.entries.push({
+      id: crypto.randomUUID(),
+      provider,
+      account: "quick-add",
+      prompts,
+      minutes,
+      createdAt: new Date().toISOString(),
+    });
+
+    toggleDay(dateKeyFromDate(new Date()), true);
+    refs.quickAddForm.reset();
+    persist();
+    renderAll();
+    closeQuickAdd();
+  });
+}
+
+function closeQuickAdd() {
+  refs.quickAddModal.classList.remove("open");
+  refs.quickAddModal.setAttribute("aria-hidden", "true");
+}
+
+/* ======== NAVIGATION ======== */
 function bindNavigation() {
   refs.brandHome.addEventListener("click", () => navigateToPage("home"));
 
@@ -123,15 +329,13 @@ function bindNavigation() {
   });
 
   document.addEventListener("click", (event) => {
-    const sidebarOpen = refs.sidebar.classList.contains("open");
-    if (!sidebarOpen) return;
-
-    const target = event.target;
-    if (refs.sidebar.contains(target) || refs.menuToggle.contains(target)) return;
+    if (!refs.sidebar.classList.contains("open")) return;
+    if (refs.sidebar.contains(event.target) || refs.menuToggle.contains(event.target)) return;
     closeSidebar();
   });
 }
 
+/* ======== THEME ======== */
 function bindTheme() {
   refs.themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("light");
@@ -141,104 +345,76 @@ function bindTheme() {
 }
 
 function applyTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved === "light") {
-    document.body.classList.add("light");
-  }
+  if (localStorage.getItem(THEME_KEY) === "light") document.body.classList.add("light");
   updateThemeButtonLabel();
 }
 
 function updateThemeButtonLabel() {
   const isLight = document.body.classList.contains("light");
   refs.themeToggle.setAttribute("aria-checked", String(isLight));
-  refs.themeToggle.setAttribute("title", isLight ? "Switch to dark mode" : "Switch to light mode");
   refs.themeToggle.textContent = isLight ? "Dark" : "Light";
 }
 
+/* ======== LOGIN ======== */
 function bindLoginModal() {
   refs.loginOpen.addEventListener("click", () => {
     refs.loginModal.classList.add("open");
     refs.loginModal.setAttribute("aria-hidden", "false");
   });
-
   refs.loginClose.addEventListener("click", closeLoginModal);
-
-  refs.loginModal.addEventListener("click", (event) => {
-    if (event.target === refs.loginModal) closeLoginModal();
-  });
-
-  refs.loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    alert("Login flow UI is ready. Backend auth is not connected yet.");
+  refs.loginModal.addEventListener("click", (e) => { if (e.target === refs.loginModal) closeLoginModal(); });
+  refs.loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    alert("Login flow UI ready. Backend auth not connected yet.");
     closeLoginModal();
   });
 }
 
+/* ======== HOME CALENDAR ======== */
 function bindHomeCalendar() {
   refs.homePrevMonth.addEventListener("click", () => {
     state.homeDate = new Date(state.homeDate.getFullYear(), state.homeDate.getMonth() - 1, 1);
-    renderHomeCalendar();
-    renderStats();
-    renderHomeMetrics();
+    renderHomeCalendar(); renderStats(); renderHomeMetrics();
   });
-
   refs.homeNextMonth.addEventListener("click", () => {
     state.homeDate = new Date(state.homeDate.getFullYear(), state.homeDate.getMonth() + 1, 1);
-    renderHomeCalendar();
-    renderStats();
-    renderHomeMetrics();
+    renderHomeCalendar(); renderStats(); renderHomeMetrics();
   });
 }
 
+/* ======== USAGE CALENDAR ======== */
 function bindUsageCalendar() {
-  refs.viewButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      state.usageView = button.dataset.view;
-      refs.viewButtons.forEach((b) => b.classList.toggle("active", b === button));
+  refs.viewButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.usageView = btn.dataset.view;
+      refs.viewButtons.forEach((b) => b.classList.toggle("active", b === btn));
       renderUsageCalendar();
     });
   });
-
-  refs.usagePrev.addEventListener("click", () => {
-    stepUsageDate(-1);
-    renderUsageCalendar();
-  });
-
-  refs.usageNext.addEventListener("click", () => {
-    stepUsageDate(1);
-    renderUsageCalendar();
-  });
+  refs.usagePrev.addEventListener("click", () => { stepUsageDate(-1); renderUsageCalendar(); });
+  refs.usageNext.addEventListener("click", () => { stepUsageDate(1); renderUsageCalendar(); });
 }
 
 function stepUsageDate(delta) {
   const base = state.usageDate;
-  if (state.usageView === "week") {
-    state.usageDate = new Date(base.getFullYear(), base.getMonth(), base.getDate() + 7 * delta);
-  } else if (state.usageView === "month") {
-    state.usageDate = new Date(base.getFullYear(), base.getMonth() + delta, 1);
-  } else {
-    state.usageDate = new Date(base.getFullYear() + delta, 0, 1);
-  }
+  if (state.usageView === "week") state.usageDate = new Date(base.getFullYear(), base.getMonth(), base.getDate() + 7 * delta);
+  else if (state.usageView === "month") state.usageDate = new Date(base.getFullYear(), base.getMonth() + delta, 1);
+  else state.usageDate = new Date(base.getFullYear() + delta, 0, 1);
 }
 
+/* ======== USAGE FORM ======== */
 function bindUsageForm() {
   refs.usageForm.addEventListener("submit", (event) => {
     event.preventDefault();
-
     const data = new FormData(refs.usageForm);
     const provider = String(data.get("provider") || "").trim();
     const account = String(data.get("account") || "").trim();
     const prompts = Number(data.get("prompts"));
     const minutes = Number(data.get("minutes"));
-
     if (!provider || !account || Number.isNaN(prompts) || Number.isNaN(minutes)) return;
 
     state.entries.push({
-      id: crypto.randomUUID(),
-      provider,
-      account,
-      prompts,
-      minutes,
+      id: crypto.randomUUID(), provider, account, prompts, minutes,
       createdAt: new Date().toISOString(),
     });
 
@@ -249,6 +425,7 @@ function bindUsageForm() {
   });
 }
 
+/* ======== PROVIDER CONNECTIONS ======== */
 function bindProviderConnections() {
   refs.connectButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -261,17 +438,10 @@ function bindProviderConnections() {
         state.providerConnections[provider] = { connected: false, key: "" };
         if (input) input.value = "";
       } else {
-        if (!keyValue) {
-          input?.focus();
-          return;
-        }
+        if (!keyValue) { input?.focus(); return; }
         state.providerConnections[provider] = { connected: true, key: keyValue.slice(0, 6) };
       }
-
-      persist();
-      renderProviderStates();
-      renderHomeMetrics();
-      renderChart();
+      persist(); renderProviderStates(); renderHomeMetrics(); renderChart();
     });
   });
 
@@ -281,10 +451,7 @@ function bindProviderConnections() {
       state.providerConnections[provider] = { connected: false, key: "" };
       const input = document.querySelector(`[data-key-input="${provider}"]`);
       if (input) input.value = "";
-      persist();
-      renderProviderStates();
-      renderHomeMetrics();
-      renderChart();
+      persist(); renderProviderStates(); renderHomeMetrics(); renderChart();
     });
   });
 }
@@ -302,15 +469,15 @@ function bindChartRange() {
 function bindAboutInteraction() {
   refs.aboutChips.forEach((chip) => {
     chip.addEventListener("click", () => {
-      const selected = chip.dataset.about;
-      refs.aboutChips.forEach((node) => node.classList.toggle("active", node === chip));
-      renderAbout(selected);
+      refs.aboutChips.forEach((n) => n.classList.toggle("active", n === chip));
+      renderAbout(chip.dataset.about);
     });
   });
 }
 
+/* ======== RENDER ALL ======== */
 function renderWeekdayHeader() {
-  refs.homeWeekdays.innerHTML = WEEKDAY.map((day) => `<span>${day}</span>`).join("");
+  refs.homeWeekdays.innerHTML = WEEKDAY.map((d) => `<span>${d}</span>`).join("");
 }
 
 function renderAll() {
@@ -323,42 +490,38 @@ function renderAll() {
   renderHomeMetrics();
   renderChart();
   renderAbout("mission");
+  renderStreak();
+  renderHeatmap();
+  renderProviderBreakdown();
 }
 
+/* ======== HOME CALENDAR ======== */
 function renderHomeCalendar() {
   const y = state.homeDate.getFullYear();
   const m = state.homeDate.getMonth();
   refs.homeMonthLabel.textContent = state.homeDate.toLocaleDateString(undefined, { month: "long", year: "numeric" });
-  refs.homeMonthCalendar.innerHTML = buildMonthCells(y, m, "day-cell", { compact: true });
+  refs.homeMonthCalendar.innerHTML = buildMonthCells(y, m, "day-cell", { markToday: true });
   bindCalendarClicks(refs.homeMonthCalendar);
 }
 
+/* ======== USAGE CALENDAR ======== */
 function renderUsageCalendar() {
-  if (state.usageView === "week") {
-    renderUsageWeek();
-    return;
-  }
-
-  if (state.usageView === "month") {
-    renderUsageMonth();
-    return;
-  }
-
+  if (state.usageView === "week") { renderUsageWeek(); return; }
+  if (state.usageView === "month") { renderUsageMonth(); return; }
   renderUsageYear();
 }
 
 function renderUsageWeek() {
   const start = startOfWeek(state.usageDate);
   const days = [];
-  for (let i = 0; i < 7; i += 1) {
+  for (let i = 0; i < 7; i++) {
     const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
     const key = dateKeyFromDate(d);
     const active = state.usageDays[key] ? "active" : "";
     days.push(`<button class="day-cell ${active}" data-date="${key}"><span>${WEEKDAY[i]}</span><strong>${d.getDate()}</strong></button>`);
   }
-
   const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
-  refs.usageLabel.textContent = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+  refs.usageLabel.textContent = `${start.toLocaleDateString()} – ${end.toLocaleDateString()}`;
   refs.usageCalendarFrame.innerHTML = `<div class="usage-week-grid">${days.join("")}</div>`;
   bindCalendarClicks(refs.usageCalendarFrame);
 }
@@ -366,48 +529,31 @@ function renderUsageWeek() {
 function renderUsageMonth() {
   const anchor = new Date(state.usageDate.getFullYear(), state.usageDate.getMonth(), 1);
   refs.usageLabel.textContent = `Month overview from ${anchor.toLocaleDateString(undefined, { month: "long", year: "numeric" })}`;
-
   const blocks = [];
-  for (let i = 0; i < 18; i += 1) {
+  for (let i = 0; i < 18; i++) {
     const d = new Date(anchor.getFullYear(), anchor.getMonth() - i, 1);
-    const y = d.getFullYear();
-    const m = d.getMonth();
     blocks.push(`
       <article class="usage-month-card">
         <h4>${d.toLocaleDateString(undefined, { month: "short", year: "numeric" })}</h4>
-        <div class="usage-month-mini-grid">${buildMonthCells(y, m, "usage-month-mini-cell", { compact: true })}</div>
-      </article>
-    `);
+        <div class="usage-month-mini-grid">${buildMonthCells(d.getFullYear(), d.getMonth(), "usage-month-mini-cell", { compact: true })}</div>
+      </article>`);
   }
-
-  refs.usageCalendarFrame.innerHTML = `
-    <div class="usage-month-overview">
-      <div class="usage-month-overview-grid">${blocks.join("")}</div>
-    </div>
-  `;
+  refs.usageCalendarFrame.innerHTML = `<div class="usage-month-overview"><div class="usage-month-overview-grid">${blocks.join("")}</div></div>`;
   bindCalendarClicks(refs.usageCalendarFrame);
 }
 
 function renderUsageYear() {
   const y = state.usageDate.getFullYear();
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   refs.usageLabel.textContent = String(y);
-
   refs.usageCalendarFrame.innerHTML = `
     <div class="usage-year-grid">
-      ${monthNames
-        .map((name, index) => {
-          return `
-            <article class="year-mini">
-              <h4>${name}</h4>
-              <div class="year-mini-grid">${buildMonthCells(y, index, "year-mini-cell", { compact: true })}</div>
-            </article>
-          `;
-        })
-        .join("")}
-    </div>
-  `;
-
+      ${months.map((name, i) => `
+        <article class="year-mini">
+          <h4>${name}</h4>
+          <div class="year-mini-grid">${buildMonthCells(y, i, "year-mini-cell", { compact: true })}</div>
+        </article>`).join("")}
+    </div>`;
   bindCalendarClicks(refs.usageCalendarFrame);
 }
 
@@ -415,60 +561,53 @@ function buildMonthCells(year, month, className, options = {}) {
   const firstDay = new Date(year, month, 1).getDay();
   const days = new Date(year, month + 1, 0).getDate();
   const total = options.compact ? Math.ceil((firstDay + days) / 7) * 7 : 42;
+  const todayKey = dateKeyFromDate(new Date());
   let cursor = 1;
   let html = "";
 
-  for (let i = 0; i < total; i += 1) {
+  for (let i = 0; i < total; i++) {
     if (i < firstDay || cursor > days) {
       html += `<span class="${className} empty"></span>`;
       continue;
     }
-
     const key = dateKey(year, month, cursor);
-    const active = state.usageDays[key] ? "active" : "";
-    html += `<button class="${className} ${active}" data-date="${key}">${cursor}</button>`;
-    cursor += 1;
+    const active = state.usageDays[key] ? " active" : "";
+    const today = options.markToday && key === todayKey ? " today" : "";
+    html += `<button class="${className}${active}${today}" data-date="${key}">${cursor}</button>`;
+    cursor++;
   }
-
   return html;
 }
 
+/* ======== BAR CHART ======== */
 function renderUsageBarChart() {
   const points = collectUsageBarPoints();
-  const w = 900;
-  const h = 220;
-  const p = 24;
+  const w = 900, h = 200, p = 22;
   const max = Math.max(1, ...points.map((d) => d.value));
   const barGap = 3;
-  const usableW = w - p * 2;
-  const barW = Math.max(3, (usableW - barGap * (points.length - 1)) / points.length);
+  const barW = Math.max(3, (w - p * 2 - barGap * (points.length - 1)) / points.length);
 
-  const bars = points
-    .map((point, i) => {
-      const x = p + i * (barW + barGap);
-      const barH = (point.value / max) * (h - p * 2);
-      const y = h - p - barH;
-      const fill = point.value > 0 ? "rgba(93,230,187,0.86)" : "rgba(120,138,175,0.22)";
-      return `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(2, barH)}" rx="2" fill="${fill}" />`;
-    })
-    .join("");
+  const bars = points.map((pt, i) => {
+    const x = p + i * (barW + barGap);
+    const barH = (pt.value / max) * (h - p * 2);
+    const y = h - p - barH;
+    const fill = pt.value > 0 ? "rgba(52,211,153,0.75)" : "rgba(90,95,122,0.1)";
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(2, barH)}" rx="2" fill="${fill}" />`;
+  }).join("");
 
   const labels = points
     .filter((_, i) => i % Math.ceil(points.length / 6) === 0 || i === points.length - 1)
-    .map((point, i, arr) => {
-      const idx = points.indexOf(point);
+    .map((pt) => {
+      const idx = points.indexOf(pt);
       const x = p + idx * (barW + barGap) + barW / 2;
-      return `<text x="${x}" y="${h - 4}" text-anchor="middle" font-size="10" fill="rgba(140,160,210,0.8)">${point.label}</text>`;
-    })
-    .join("");
+      return `<text x="${x}" y="${h - 4}" text-anchor="middle" font-size="9" fill="rgba(90,95,122,0.6)" font-family="JetBrains Mono,monospace">${pt.label}</text>`;
+    }).join("");
 
   refs.usageBarChart.innerHTML = `
-    <svg viewBox="0 0 ${w} ${h}" width="100%" height="220" role="img" aria-label="Usage bars by day">
-      <line x1="${p}" y1="${h - p}" x2="${w - p}" y2="${h - p}" stroke="rgba(120,140,185,0.35)" stroke-width="1" />
-      ${bars}
-      ${labels}
-    </svg>
-  `;
+    <svg viewBox="0 0 ${w} ${h}" width="100%" height="200" role="img" aria-label="Usage bars">
+      <line x1="${p}" y1="${h - p}" x2="${w - p}" y2="${h - p}" stroke="rgba(90,95,122,0.15)" stroke-width="1" />
+      ${bars}${labels}
+    </svg>`;
 }
 
 function collectUsageBarPoints() {
@@ -476,87 +615,108 @@ function collectUsageBarPoints() {
     const start = startOfWeek(state.usageDate);
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      const key = dateKeyFromDate(d);
-      return { label: String(d.getDate()), value: dayUsageValue(key) };
+      return { label: String(d.getDate()), value: dayUsageValue(dateKeyFromDate(d)) };
     });
   }
-
-  const y = state.usageDate.getFullYear();
-  const m = state.usageDate.getMonth();
+  const y = state.usageDate.getFullYear(), m = state.usageDate.getMonth();
   const days = new Date(y, m + 1, 0).getDate();
   return Array.from({ length: days }, (_, i) => {
-    const day = i + 1;
-    const key = dateKey(y, m, day);
-    return { label: String(day), value: dayUsageValue(key) };
+    return { label: String(i + 1), value: dayUsageValue(dateKey(y, m, i + 1)) };
   });
 }
 
 function dayUsageValue(key) {
-  const count = state.entries.filter((entry) => entry.createdAt && entry.createdAt.startsWith(key)).length;
-  if (count > 0) return count;
-  return state.usageDays[key] ? 1 : 0;
+  const count = state.entries.filter((e) => e.createdAt && e.createdAt.startsWith(key)).length;
+  return count > 0 ? count : state.usageDays[key] ? 1 : 0;
 }
 
+/* ======== LINE CHART ======== */
+function renderChart() {
+  const preferred = state.providerConnections.OpenAI.connected ? "OpenAI" : state.providerConnections.Claude.connected ? "Claude" : "OpenAI";
+  const source = SAMPLE_USAGE[preferred];
+  const points = source.slice(-state.chartRange);
+  const w = 860, h = 210, p = 20;
+  const min = Math.min(...points), max = Math.max(...points);
+  const range = max - min || 1;
+
+  const coords = points.map((val, idx) => {
+    const x = p + (idx / (points.length - 1 || 1)) * (w - p * 2);
+    const y = h - p - ((val - min) / range) * (h - p * 2);
+    return `${x},${y}`;
+  }).join(" ");
+
+  refs.usageChart.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" width="100%" height="210" role="img" aria-label="${preferred} usage trend">
+      <defs>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(0,212,255,0.9)" />
+          <stop offset="100%" stop-color="rgba(167,139,250,0.9)" />
+        </linearGradient>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(0,212,255,0.1)" />
+          <stop offset="100%" stop-color="rgba(0,212,255,0)" />
+        </linearGradient>
+      </defs>
+      <line x1="${p}" y1="${h - p}" x2="${w - p}" y2="${h - p}" stroke="rgba(90,95,122,0.15)" stroke-width="1" />
+      <polygon fill="url(#areaGrad)" points="${p},${h - p} ${coords} ${w - p * 2 + p},${h - p}" opacity="0.6" />
+      <polyline fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${coords}" />
+      ${points.map((val, idx) => {
+        const x = p + (idx / (points.length - 1 || 1)) * (w - p * 2);
+        const y = h - p - ((val - min) / range) * (h - p * 2);
+        return `<circle cx="${x}" cy="${y}" r="2.2" fill="rgba(0,212,255,1)" />`;
+      }).join("")}
+    </svg>`;
+
+  const avg = Math.round(points.reduce((a, b) => a + b, 0) / points.length);
+  refs.chartFoot.textContent = `${preferred} sample: avg ${avg} prompts/day`;
+}
+
+/* ======== CALENDAR CLICK HANDLER ======== */
 function bindCalendarClicks(root) {
   root.querySelectorAll("button[data-date]").forEach((node) => {
     node.addEventListener("click", () => {
-      const key = node.dataset.date;
-      toggleDay(key, !state.usageDays[key]);
+      toggleDay(node.dataset.date, !state.usageDays[node.dataset.date]);
       persist();
       renderAll();
     });
   });
 }
 
+/* ======== ENTRIES ======== */
 function renderEntries() {
   if (!state.entries.length) {
     refs.accountList.innerHTML = '<p class="mini-label">No usage entries yet.</p>';
     return;
   }
+  refs.accountList.innerHTML = state.entries.map((e) => `
+    <article class="entry-row">
+      <strong>${escapeHtml(e.provider)}</strong>
+      <span>${escapeHtml(e.account)}</span>
+      <span>${e.prompts} prompts</span>
+      <span>${e.minutes} min</span>
+      <button class="remove-btn" data-remove="${e.id}">Remove</button>
+    </article>`).join("");
 
-  refs.accountList.innerHTML = state.entries
-    .map(
-      (entry) => `
-      <article class="entry-row">
-        <strong>${escapeHtml(entry.provider)}</strong>
-        <span>${escapeHtml(entry.account)}</span>
-        <span>${entry.prompts} prompts</span>
-        <span>${entry.minutes} min</span>
-        <button class="remove-btn" data-remove="${entry.id}">Remove</button>
-      </article>
-    `
-    )
-    .join("");
-
-  refs.accountList.querySelectorAll("[data-remove]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.entries = state.entries.filter((entry) => entry.id !== button.dataset.remove);
-      persist();
-      renderAll();
+  refs.accountList.querySelectorAll("[data-remove]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.entries = state.entries.filter((e) => e.id !== btn.dataset.remove);
+      persist(); renderAll();
     });
   });
 }
 
+/* ======== STATS ======== */
 function renderStats() {
-  const monthY = state.homeDate.getFullYear();
-  const monthM = state.homeDate.getMonth();
-
-  const usedMonth = Object.keys(state.usageDays).filter((key) => {
-    const d = new Date(`${key}T00:00:00`);
-    return d.getFullYear() === monthY && d.getMonth() === monthM;
+  const mY = state.homeDate.getFullYear(), mM = state.homeDate.getMonth();
+  const usedMonth = Object.keys(state.usageDays).filter((k) => {
+    const d = new Date(`${k}T00:00:00`);
+    return d.getFullYear() === mY && d.getMonth() === mM;
   }).length;
 
   const currentYear = new Date().getFullYear();
-  const usedYear = Object.keys(state.usageDays).filter((key) => key.startsWith(`${currentYear}-`)).length;
+  const usedYear = Object.keys(state.usageDays).filter((k) => k.startsWith(`${currentYear}-`)).length;
 
-  const totals = state.entries.reduce(
-    (acc, entry) => {
-      acc.prompts += entry.prompts;
-      acc.minutes += entry.minutes;
-      return acc;
-    },
-    { prompts: 0, minutes: 0 }
-  );
+  const totals = state.entries.reduce((a, e) => ({ prompts: a.prompts + e.prompts, minutes: a.minutes + e.minutes }), { prompts: 0, minutes: 0 });
 
   refs.usedDays.textContent = String(usedMonth);
   refs.usedYearDays.textContent = String(usedYear);
@@ -568,83 +728,46 @@ function renderStats() {
 function renderProviderStates() {
   refs.statusPills.forEach((pill) => {
     const provider = pill.dataset.status;
-    const connection = state.providerConnections[provider];
-    const connected = !!connection?.connected;
-
-    pill.textContent = connected ? `Connected (${connection.key}...)` : "Not connected";
+    const conn = state.providerConnections[provider];
+    const connected = !!conn?.connected;
+    pill.textContent = connected ? `Connected (${conn.key}...)` : "Not connected";
     pill.classList.toggle("connected", connected);
 
-    const connectButton = document.querySelector(`[data-connect="${provider}"]`);
-    const removeButton = document.querySelector(`[data-remove-key="${provider}"]`);
-    if (connectButton) connectButton.textContent = connected ? "Disconnect" : "Connect";
-    if (removeButton) removeButton.classList.toggle("show", connected);
+    const connectBtn = document.querySelector(`[data-connect="${provider}"]`);
+    const removeBtn = document.querySelector(`[data-remove-key="${provider}"]`);
+    if (connectBtn) connectBtn.textContent = connected ? "Disconnect" : "Connect";
+    if (removeBtn) removeBtn.classList.toggle("show", connected);
   });
 }
 
 function renderHomeMetrics() {
-  const connected = Object.values(state.providerConnections).filter((item) => item.connected).length;
-  const totals = state.entries.reduce((acc, entry) => ({ prompts: acc.prompts + entry.prompts }), { prompts: 0 });
-
-  const y = state.homeDate.getFullYear();
-  const m = state.homeDate.getMonth();
-  const used = Object.keys(state.usageDays).filter((key) => {
-    const d = new Date(`${key}T00:00:00`);
+  const connected = Object.values(state.providerConnections).filter((p) => p.connected).length;
+  const totals = state.entries.reduce((a, e) => ({ prompts: a.prompts + e.prompts, minutes: a.minutes + e.minutes }), { prompts: 0, minutes: 0 });
+  const y = state.homeDate.getFullYear(), m = state.homeDate.getMonth();
+  const used = Object.keys(state.usageDays).filter((k) => {
+    const d = new Date(`${k}T00:00:00`);
     return d.getFullYear() === y && d.getMonth() === m;
   }).length;
 
-  refs.connectedCount.textContent = String(connected);
-  refs.homeUsedDays.textContent = `${used} days`;
-  refs.homePromptTotal.textContent = String(totals.prompts);
-}
-
-function renderChart() {
-  const preferred = state.providerConnections.OpenAI.connected ? "OpenAI" : state.providerConnections.Claude.connected ? "Claude" : "OpenAI";
-  const source = SAMPLE_USAGE[preferred];
-  const points = source.slice(-state.chartRange);
-
-  const w = 860;
-  const h = 230;
-  const p = 22;
-  const min = Math.min(...points);
-  const max = Math.max(...points);
-  const range = max - min || 1;
-
-  const coords = points
-    .map((val, idx) => {
-      const x = p + (idx / (points.length - 1 || 1)) * (w - p * 2);
-      const y = h - p - ((val - min) / range) * (h - p * 2);
-      return `${x},${y}`;
-    })
-    .join(" ");
-
-  refs.usageChart.innerHTML = `
-    <svg viewBox="0 0 ${w} ${h}" width="100%" height="230" role="img" aria-label="${preferred} usage trend">
-      <polyline fill="none" stroke="rgba(110,168,255,0.35)" stroke-width="1" points="${p},${h - p} ${w - p},${h - p}" />
-      <polyline fill="none" stroke="rgba(93,230,187,0.92)" stroke-width="3" points="${coords}" />
-      ${points
-        .map((val, idx) => {
-          const x = p + (idx / (points.length - 1 || 1)) * (w - p * 2);
-          const y = h - p - ((val - min) / range) * (h - p * 2);
-          return `<circle cx="${x}" cy="${y}" r="2.7" fill="rgba(93,230,187,1)" />`;
-        })
-        .join("")}
-    </svg>
-  `;
-
-  const avg = Math.round(points.reduce((a, b) => a + b, 0) / points.length);
-  refs.chartFoot.textContent = `${preferred} sample usage: avg ${avg} prompts/day in the selected period.`;
+  // Animate counters
+  animateCounter(refs.connectedCount, connected);
+  animateCounter(refs.homeUsedDays, used);
+  animateCounter(refs.homePromptTotal, totals.prompts);
+  animateCounter(refs.homeMinuteTotal, totals.minutes);
 }
 
 function renderAbout(key) {
-  const selected = ABOUT_CONTENT[key] || ABOUT_CONTENT.mission;
-  refs.aboutMessage.textContent = selected.message;
-  refs.aboutPanel.innerHTML = `<h4>${selected.title}</h4><p>${selected.detail}</p>`;
+  const s = ABOUT_CONTENT[key] || ABOUT_CONTENT.mission;
+  refs.aboutMessage.textContent = s.message;
+  refs.aboutPanel.innerHTML = `<h4>${s.title}</h4><p>${s.detail}</p>`;
 }
 
+/* ======== NAV HELPERS ======== */
 function navigateToPage(pageName) {
-  refs.navItems.forEach((node) => node.classList.toggle("active", node.dataset.page === pageName));
-  refs.pages.forEach((page) => page.classList.toggle("active", page.dataset.page === pageName));
+  refs.navItems.forEach((n) => n.classList.toggle("active", n.dataset.page === pageName));
+  refs.pages.forEach((p) => p.classList.toggle("active", p.dataset.page === pageName));
   closeSidebar();
+  window.scrollTo(0, 0);
 }
 
 function closeSidebar() {
@@ -658,35 +781,29 @@ function closeLoginModal() {
   refs.loginModal.setAttribute("aria-hidden", "true");
 }
 
+/* ======== DATA HELPERS ======== */
 function toggleDay(key, active) {
   if (active) state.usageDays[key] = true;
   else delete state.usageDays[key];
 }
 
 function persist() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      usageDays: state.usageDays,
-      entries: state.entries,
-      providerConnections: state.providerConnections,
-    })
-  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    usageDays: state.usageDays,
+    entries: state.entries,
+    providerConnections: state.providerConnections,
+  }));
 }
 
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return;
-
   try {
     const parsed = JSON.parse(raw);
     state.usageDays = parsed.usageDays && typeof parsed.usageDays === "object" ? parsed.usageDays : {};
     state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
     if (parsed.providerConnections && typeof parsed.providerConnections === "object") {
-      state.providerConnections = {
-        ...state.providerConnections,
-        ...parsed.providerConnections,
-      };
+      state.providerConnections = { ...state.providerConnections, ...parsed.providerConnections };
     }
   } catch {
     state.usageDays = {};
@@ -701,9 +818,7 @@ function startOfWeek(date) {
 }
 
 function dateKey(year, monthIndex, day) {
-  const mm = String(monthIndex + 1).padStart(2, "0");
-  const dd = String(day).padStart(2, "0");
-  return `${year}-${mm}-${dd}`;
+  return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
 function dateKeyFromDate(date) {
@@ -711,10 +826,5 @@ function dateKeyFromDate(date) {
 }
 
 function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }
