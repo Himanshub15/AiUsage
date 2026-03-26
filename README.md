@@ -1,102 +1,83 @@
 # AiUsage
 
-AiUsage is a clean, interactive web app to track AI usage across providers, accounts, and daily activity.
+> Track your AI activity in one clean dashboard. Live site: **[https://himanshub15.github.io/AiUsage/](https://himanshub15.github.io/AiUsage/)**
 
-## What It Does
+![GitHub Pages](https://img.shields.io/badge/Deployed-GitHub%20Pages-222222?style=for-the-badge&logo=github)
+![HTML](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-111827?style=for-the-badge&logo=javascript)
 
-- Track daily AI usage with a clickable Home calendar.
-- Add usage entries by provider/account with prompts and minutes.
-- Maintain usage stats (month/year usage days, total prompts, total minutes, entries).
-- Manage AI account integration state for OpenAI and Claude.
-- View sample usage trend analytics on the AI Account page.
-- Navigate usage calendars in multiple views:
-  - Week view
-  - Month overview (3 months per row, scrollable)
-  - Year view (12-month compact frame)
-- See daily usage activity bars under the Usage Calendar.
-- Toggle dark/light theme.
-- Open/close sidebar navigation from hamburger menu, including outside-click close.
-- Use a login UI modal (Email, Google, Apple, Passkey placeholders).
-- Persistent state using `localStorage`.
+## Supports
 
-## Tech Stack
+<img src="https://cdn.simpleicons.org/openai" alt="OpenAI" width="20" /> OpenAI &nbsp;
+<img src="https://cdn.simpleicons.org/anthropic" alt="Anthropic" width="20" /> Claude &nbsp;
+<img src="https://cdn.simpleicons.org/google" alt="Google" width="20" /> Gemini &nbsp;
+<img src="https://cdn.simpleicons.org/microsoft" alt="Microsoft" width="20" /> Copilot &nbsp;
+<img src="https://cdn.simpleicons.org/meta" alt="Meta" width="20" /> Meta AI &nbsp;
+<img src="https://cdn.simpleicons.org/huggingface" alt="Hugging Face" width="20" /> Hugging Face
+
+## Highlights
+
+- Clickable **Home month calendar** for daily AI usage tracking
+- **AI Account** integrations UI (OpenAI + Claude)
+- Sample **line analytics chart** (30d / 10d / week)
+- **Usage Calendar** with Week / Month / Year modes
+- Scrollable month overview + compact year overview
+- Minimal **daily usage bar chart**
+- Dark / Light theme toggle
+- Sidebar with outside-click close
+- Login modal UI (Email / Google / Apple / Passkey)
+- Persistent data via `localStorage`
+
+## Screens
+
+1. **Home**
+- KPI cards
+- Big date calendar
+- Moving provider band
+
+2. **AI Account**
+- Connect/disconnect keys
+- Remove key action
+- Usage trend chart
+
+3. **Usage Calendar**
+- Week / Month / Year controls
+- Period navigation
+- Usage bar chart + stats + entry form
+
+4. **About Us**
+- Interactive Mission / Builder / Vision panel
+
+## Tech
 
 - HTML
 - CSS
 - Vanilla JavaScript
-- No framework/build tool required
+- Static deployment (GitHub Pages)
 
-## Project Structure
-
-- `index.html` - layout and UI sections
-- `styles.css` - theme, layout, responsive styling
-- `script.js` - interactions, state, rendering logic
-
-## Run Locally
-
-From the project folder:
+## Local Run
 
 ```bash
 cd "/Users/himanshubhusari/Desktop/AiUsage"
 python3 -m http.server 5500
 ```
 
-Open:
+Open `http://localhost:5500`
 
-- `http://localhost:5500`
+## Files
 
-## Main Screens
+- `index.html` - app structure
+- `styles.css` - styling + themes + responsive layout
+- `script.js` - state management + interactions + rendering
 
-1. Home
-- Hero + summary stats cards
-- Big clickable month calendar
-- Horizontal moving supported AI provider band
+## Roadmap
 
-2. AI Account
-- Connect/Disconnect OpenAI and Claude keys (UI flow)
-- Remove key option (trash action)
-- Sample line chart with range filters: 30 days / 10 days / last week
-
-3. Usage Calendar
-- Week / Month / Year calendar modes
-- Navigation for period changes
-- Minimal daily usage bar chart
-- Usage stats
-- Manual usage entry form + list
-
-4. About Us
-- Interactive tabs (Mission / Builder / Vision)
-
-## Data Persistence
-
-App data is stored in browser `localStorage`.
-
-- Theme preference
-- Usage days
-- Usage entries
-- Provider connection state
-
-## GitHub Pages Deployment
-
-This project is static, so it works directly on GitHub Pages.
-
-### Option A: Project Site
-
-Deploy at:
-
-- `https://<your-username>.github.io/<repo-name>/`
-
-### Option B: User Site
-
-Use repo name exactly `<your-username>.github.io` to deploy at root:
-
-- `https://<your-username>.github.io/`
-
-## Future Enhancements
-
-- Real provider API integrations
+- Real API usage ingestion
 - Auth backend integration
-- Provider-wise analytics and filters
-- Export/share reports
-- Team collaboration
+- Provider-level analytics and filters
+- Export/share usage reports
 
+---
+
+Built by **Himanshu Bhusari**.

@@ -3,277 +3,413 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Usage</title>
+    <title>AiUsage — AI Usage Monitor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="bg-layer"></div>
+    <div class="bg-noise"></div>
+    <div class="bg-glow bg-glow--teal"></div>
+    <div class="bg-glow bg-glow--blue"></div>
 
-    <button id="menuToggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-
-    <button id="brandHome" class="brand-center" aria-label="Go to home">
-      <div class="brand-mark" aria-hidden="true">
-        <span></span><span></span><span></span>
-        <span></span><span></span><span></span>
-        <span></span><span></span><span></span>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-sigil">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+        <span class="brand-wordmark">AiUsage</span>
       </div>
-      <span class="brand-name">AiUsage</span>
-    </button>
 
-    <div class="top-actions">
-      <button id="loginOpen" class="login-open">Login</button>
-    </div>
-
-    <aside id="sidebar" class="sidebar" aria-hidden="true">
-      <div class="sidebar-head">
-        <p class="mini-label">AI Usage</p>
-        <h2>Control Panel</h2>
-      </div>
-      <nav class="nav-list" aria-label="Main navigation">
-        <button class="nav-item active" data-page="home">Home</button>
-        <button class="nav-item" data-page="accounts">AI Account</button>
-        <button class="nav-item" data-page="calendar">Usage Calendar</button>
-        <button class="nav-item" data-page="about">About Us</button>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <button class="nav-btn active" data-page="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-btn" data-page="providers">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+          Providers
+        </button>
+        <button class="nav-btn" data-page="analytics">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Analytics
+        </button>
+        <button class="nav-btn" data-page="calendar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendar
+        </button>
+        <button class="nav-btn" data-page="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
       </nav>
-      <div class="sidebar-theme">
-        <p class="mini-label">Appearance</p>
-        <button id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle theme">Light</button>
+
+      <div class="sidebar-footer">
+        <button id="themeToggle" class="theme-btn" aria-label="Toggle theme">
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <span id="themeLabel">Dark</span>
+        </button>
+        <div class="sidebar-meta">
+          <span class="meta-pill">v2.0</span>
+          <span class="meta-text">by Himanshu</span>
+        </div>
       </div>
     </aside>
 
-    <main class="shell">
-      <section class="page active" data-page="home">
-        <header class="hero">
-          <p class="mini-label">Professional AI usage tracking</p>
-          <h1>Track all your AI usage in one place.</h1>
-          <p>
-            Collect usage from multiple accounts, click your daily activity, and keep a clean overview of your AI workflow.
-          </p>
-        </header>
+    <header class="mobile-bar" id="mobileBar">
+      <button id="menuToggle" class="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="mobile-brand">AiUsage</span>
+      <button id="mobileTheme" class="mobile-theme-btn" aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </header>
 
-        <div class="home-grid tight">
-          <article class="card glow-card">
-            <h3>Connected Accounts</h3>
-            <strong id="connectedCount">0</strong>
-            <p>Number of AI accounts currently integrated.</p>
-          </article>
-          <article class="card">
-            <h3>Usage This Month</h3>
-            <strong id="homeUsedDays">0 days</strong>
-            <p>Marked days in the current month.</p>
-          </article>
-          <article class="card">
-            <h3>Total Prompt Volume</h3>
-            <strong id="homePromptTotal">0</strong>
-            <p>Combined prompt count from all entries.</p>
-          </article>
-        </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <section class="card home-calendar-card">
-          <header class="section-head calendar-head-row">
-            <div>
-              <p class="mini-label">Daily tracker</p>
-              <h2>Home Calendar</h2>
-            </div>
-            <div class="nav-pair">
-              <button id="homePrevMonth" aria-label="Previous month">&#10094;</button>
-              <strong id="homeMonthLabel"></strong>
-              <button id="homeNextMonth" aria-label="Next month">&#10095;</button>
-            </div>
-          </header>
-          <div id="homeWeekdays" class="weekday-row"></div>
-          <div id="homeMonthCalendar" class="month-calendar-big"></div>
-        </section>
-
-        <section class="support-section card">
-          <div class="support-head">
-            <p class="mini-label">Ecosystem support</p>
-            <h3>We support a wide AI stack</h3>
-            <p>As you scale your workflow, keep everything in one usage system.</p>
-          </div>
-
-          <div class="providers-band" aria-label="Supported AI providers">
-            <div class="providers-track">
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="OpenAI" />OpenAI</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="Claude" />Claude</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="Gemini" />Gemini</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="Perplexity" />Perplexity</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=copilot.microsoft.com&sz=64" alt="Copilot" />Copilot</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=meta.ai&sz=64" alt="Meta AI" />Meta AI</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=x.ai&sz=64" alt="xAI" />xAI</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="DeepSeek" />DeepSeek</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=mistral.ai&sz=64" alt="Mistral" />Mistral</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=poe.com&sz=64" alt="Poe" />Poe</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=runwayml.com&sz=64" alt="Runway" />Runway</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="Notion AI" />Notion AI</span>
-            </div>
-            <div class="providers-track" aria-hidden="true">
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="" />OpenAI</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=anthropic.com&sz=64" alt="" />Claude</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64" alt="" />Gemini</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64" alt="" />Perplexity</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=copilot.microsoft.com&sz=64" alt="" />Copilot</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=meta.ai&sz=64" alt="" />Meta AI</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=x.ai&sz=64" alt="" />xAI</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=deepseek.com&sz=64" alt="" />DeepSeek</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=mistral.ai&sz=64" alt="" />Mistral</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=poe.com&sz=64" alt="" />Poe</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=runwayml.com&sz=64" alt="" />Runway</span>
-              <span class="provider-pill"><img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="" />Notion AI</span>
-            </div>
-          </div>
-        </section>
-      </section>
-
-      <section class="page" data-page="accounts">
-        <header class="section-head">
-          <p class="mini-label">AI Account</p>
-          <h2>Integrate your providers + usage trend</h2>
-        </header>
-
-        <div class="account-grid">
-          <article class="card provider-card" data-provider="OpenAI">
-            <div>
-              <h3>OpenAI</h3>
-              <p>Connect your OpenAI key to enable account tracking.</p>
-            </div>
-            <div class="provider-actions">
-              <input type="password" data-key-input="OpenAI" placeholder="OpenAI API key" />
-              <button class="action-btn" data-connect="OpenAI">Connect</button>
-              <button class="remove-key-btn" data-remove-key="OpenAI" title="Remove API key" aria-label="Remove OpenAI API key">&#128465;</button>
-            </div>
-            <span class="status-pill" data-status="OpenAI">Not connected</span>
-          </article>
-
-          <article class="card provider-card" data-provider="Claude">
-            <div>
-              <h3>Claude</h3>
-              <p>Integrate Claude usage and keep analytics in one dashboard.</p>
-            </div>
-            <div class="provider-actions">
-              <input type="password" data-key-input="Claude" placeholder="Claude API key" />
-              <button class="action-btn" data-connect="Claude">Connect</button>
-              <button class="remove-key-btn" data-remove-key="Claude" title="Remove API key" aria-label="Remove Claude API key">&#128465;</button>
-            </div>
-            <span class="status-pill" data-status="Claude">Not connected</span>
-          </article>
-        </div>
-
-        <article class="card chart-card">
-          <div class="chart-top">
-            <h3>Usage Trend (sample OpenAI stats)</h3>
-            <div class="range-pills">
-              <button class="range-pill active" data-range="30">Last 30 days</button>
-              <button class="range-pill" data-range="10">Last 10 days</button>
-              <button class="range-pill" data-range="7">Last week</button>
-            </div>
-          </div>
-          <div id="usageChart" class="usage-chart" aria-label="Usage trend line chart"></div>
-          <div class="chart-foot" id="chartFoot"></div>
-        </article>
-      </section>
-
-      <section class="page" data-page="calendar">
-        <header class="section-head calendar-head-row">
+    <main class="main" id="main">
+      <!-- ═══════════════ DASHBOARD ═══════════════ -->
+      <section class="page active" data-page="dashboard">
+        <div class="page-header">
           <div>
-            <p class="mini-label">Usage Calendar</p>
-            <h2>Week / Month / Year view</h2>
+            <p class="page-label">Overview</p>
+            <h1 class="page-title">Dashboard</h1>
           </div>
-          <div class="calendar-controls">
-            <div class="mode-pills">
-              <button class="mode-pill active" data-view="week">Week</button>
-              <button class="mode-pill" data-view="month">Month</button>
-              <button class="mode-pill" data-view="year">Year</button>
-            </div>
-            <div class="nav-pair">
-              <button id="usagePrev" aria-label="Previous">&#10094;</button>
-              <strong id="usageLabel"></strong>
-              <button id="usageNext" aria-label="Next">&#10095;</button>
-            </div>
-          </div>
-        </header>
+          <button class="btn btn--primary" id="addEntryBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Log Usage
+          </button>
+        </div>
 
-        <article class="card usage-frame-card">
-          <div id="usageCalendarFrame" class="usage-calendar-frame"></div>
-        </article>
-        <article class="card usage-bar-card">
-          <h3>Daily Usage Bars</h3>
-          <div id="usageBarChart" class="usage-bar-chart" aria-label="Daily usage bar chart"></div>
-        </article>
-
-        <div class="calendar-layout dense stats-only">
-          <article class="card stats-card">
-            <h3>Usage Stats</h3>
-            <div class="stat-line"><span>Used days (month)</span><strong id="usedDays">0</strong></div>
-            <div class="stat-line"><span>Used days (year)</span><strong id="usedYearDays">0</strong></div>
-            <div class="stat-line"><span>Entries</span><strong id="entryCount">0</strong></div>
-            <div class="stat-line"><span>Total prompts</span><strong id="promptTotal">0</strong></div>
-            <div class="stat-line"><span>Total minutes</span><strong id="minuteTotal">0</strong></div>
+        <div class="kpi-row" id="kpiRow">
+          <article class="kpi-card kpi-card--accent">
+            <div class="kpi-top">
+              <span class="kpi-label">Monthly Cost</span>
+              <span class="kpi-badge kpi-badge--up" id="kpiCostBadge">+12%</span>
+            </div>
+            <strong class="kpi-value" id="kpiCost">$0.00</strong>
+            <div class="kpi-spark" id="kpiCostSpark"></div>
+          </article>
+          <article class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Total Tokens</span>
+              <span class="kpi-badge" id="kpiTokenBadge">0</span>
+            </div>
+            <strong class="kpi-value" id="kpiTokens">0</strong>
+            <div class="kpi-spark" id="kpiTokenSpark"></div>
+          </article>
+          <article class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Active Providers</span>
+            </div>
+            <strong class="kpi-value" id="kpiProviders">0</strong>
+            <p class="kpi-sub" id="kpiProvidersSub">of 24 available</p>
+          </article>
+          <article class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Sessions Today</span>
+            </div>
+            <strong class="kpi-value" id="kpiSessions">0</strong>
+            <p class="kpi-sub" id="kpiSessionsSub">prompts logged</p>
           </article>
         </div>
 
-        <article class="card usage-entry-card">
-          <h3>Add Usage Entry</h3>
-          <form id="usageForm" class="usage-form">
-            <input name="provider" type="text" placeholder="Provider (OpenAI / Claude / Gemini)" required />
-            <input name="account" type="text" placeholder="Account label or email" required />
-            <input name="prompts" type="number" min="0" placeholder="Prompts" required />
-            <input name="minutes" type="number" min="0" placeholder="Minutes" required />
-            <button type="submit">Add</button>
-          </form>
-          <div id="accountList" class="entry-list"></div>
-        </article>
+        <div class="dash-grid">
+          <section class="glass-card dash-providers-card">
+            <div class="card-header">
+              <h2 class="card-title">Provider Status</h2>
+              <span class="card-badge" id="dashProviderCount">0 active</span>
+            </div>
+            <div class="provider-status-grid" id="dashProviderGrid"></div>
+          </section>
+
+          <section class="glass-card dash-cost-card">
+            <div class="card-header">
+              <h2 class="card-title">Cost Trend (30d)</h2>
+              <div class="range-toggles">
+                <button class="range-btn active" data-range="30">30d</button>
+                <button class="range-btn" data-range="14">14d</button>
+                <button class="range-btn" data-range="7">7d</button>
+              </div>
+            </div>
+            <div class="cost-chart" id="dashCostChart"></div>
+          </section>
+        </div>
+
+        <section class="glass-card dash-recent-card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Entries</h2>
+            <button class="btn btn--ghost btn--sm" id="viewAllEntries">View all</button>
+          </div>
+          <div class="recent-entries" id="dashRecentEntries">
+            <p class="empty-state">No entries yet. Click "Log Usage" to start tracking.</p>
+          </div>
+        </section>
       </section>
 
-      <section class="page" data-page="about">
-        <header class="section-head">
-          <p class="mini-label">About Us</p>
-          <h2>Built with purpose by Himanshu Bhusari</h2>
-        </header>
+      <!-- ═══════════════ PROVIDERS ═══════════════ -->
+      <section class="page" data-page="providers">
+        <div class="page-header">
+          <div>
+            <p class="page-label">Manage</p>
+            <h1 class="page-title">Providers</h1>
+          </div>
+          <div class="provider-filters">
+            <button class="filter-chip active" data-filter="all">All</button>
+            <button class="filter-chip" data-filter="chat">Chat</button>
+            <button class="filter-chip" data-filter="ide">IDE</button>
+            <button class="filter-chip" data-filter="media">Media</button>
+            <button class="filter-chip" data-filter="other">Other</button>
+          </div>
+        </div>
+        <div class="providers-grid" id="providersGrid"></div>
+      </section>
 
-        <article class="card about-card interactive">
-          <p id="aboutMessage" class="about-message">
-            AiUsage helps you build a simple daily habit of tracking AI work, across every account you use.
-          </p>
-          <div class="about-chips">
-            <button class="about-chip active" data-about="mission">Mission</button>
-            <button class="about-chip" data-about="builder">Builder</button>
-            <button class="about-chip" data-about="vision">Vision</button>
+      <!-- ═══════════════ ANALYTICS ═══════════════ -->
+      <section class="page" data-page="analytics">
+        <div class="page-header">
+          <div>
+            <p class="page-label">Insights</p>
+            <h1 class="page-title">Analytics</h1>
           </div>
-          <div id="aboutPanel" class="about-panel">
-            <h4>Mission</h4>
-            <p>Give users one clean place to track AI usage without complex setup.</p>
+          <div class="analytics-period">
+            <button class="period-btn active" data-period="daily">Daily</button>
+            <button class="period-btn" data-period="weekly">Weekly</button>
+            <button class="period-btn" data-period="monthly">Monthly</button>
           </div>
-        </article>
+        </div>
+
+        <div class="analytics-grid">
+          <section class="glass-card analytics-cost-card">
+            <div class="card-header">
+              <h2 class="card-title">Cost History</h2>
+              <strong class="card-value" id="analyticsTotalCost">$0.00</strong>
+            </div>
+            <div class="analytics-chart" id="analyticsCostChart"></div>
+          </section>
+
+          <section class="glass-card analytics-breakdown-card">
+            <div class="card-header">
+              <h2 class="card-title">Provider Breakdown</h2>
+            </div>
+            <div class="breakdown-bars" id="analyticsBreakdown"></div>
+          </section>
+
+          <section class="glass-card analytics-tokens-card">
+            <div class="card-header">
+              <h2 class="card-title">Token Usage by Model</h2>
+            </div>
+            <div class="token-chart" id="analyticsTokenChart"></div>
+          </section>
+
+          <section class="glass-card analytics-plan-card">
+            <div class="card-header">
+              <h2 class="card-title">Plan Utilization</h2>
+            </div>
+            <div class="plan-meters" id="analyticsPlanMeters"></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ═══════════════ CALENDAR ═══════════════ -->
+      <section class="page" data-page="calendar">
+        <div class="page-header">
+          <div>
+            <p class="page-label">Activity</p>
+            <h1 class="page-title">Usage Calendar</h1>
+          </div>
+          <div class="calendar-nav">
+            <button class="btn btn--ghost btn--sm" id="calPrev">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <strong id="calLabel" class="cal-label"></strong>
+            <button class="btn btn--ghost btn--sm" id="calNext">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <section class="glass-card heatmap-card">
+          <div class="card-header">
+            <h2 class="card-title">Contribution Graph</h2>
+            <div class="heatmap-legend">
+              <span class="legend-label">Less</span>
+              <span class="legend-box" data-level="0"></span>
+              <span class="legend-box" data-level="1"></span>
+              <span class="legend-box" data-level="2"></span>
+              <span class="legend-box" data-level="3"></span>
+              <span class="legend-box" data-level="4"></span>
+              <span class="legend-label">More</span>
+            </div>
+          </div>
+          <div class="heatmap-container" id="heatmapContainer"></div>
+        </section>
+
+        <div class="calendar-bottom-grid">
+          <section class="glass-card cal-stats-card">
+            <h3 class="card-title">Monthly Summary</h3>
+            <div class="cal-stats" id="calStats"></div>
+          </section>
+
+          <section class="glass-card cal-detail-card">
+            <h3 class="card-title">Day Detail</h3>
+            <div class="cal-detail" id="calDetail">
+              <p class="empty-state">Click a day on the heatmap to view details.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ═══════════════ SETTINGS ═══════════════ -->
+      <section class="page" data-page="settings">
+        <div class="page-header">
+          <div>
+            <p class="page-label">Configure</p>
+            <h1 class="page-title">Settings</h1>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <section class="glass-card">
+            <h3 class="card-title">Display</h3>
+            <div class="setting-row">
+              <div>
+                <p class="setting-label">Display Mode</p>
+                <p class="setting-desc">How quotas are shown on provider cards</p>
+              </div>
+              <select id="settingDisplayMode" class="setting-select">
+                <option value="percent">Percentage</option>
+                <option value="pace">Pace</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-label">Theme</p>
+                <p class="setting-desc">Light or dark appearance</p>
+              </div>
+              <select id="settingTheme" class="setting-select">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-label">Refresh Interval</p>
+                <p class="setting-desc">Auto-refresh countdown timers</p>
+              </div>
+              <select id="settingRefresh" class="setting-select">
+                <option value="0">Manual</option>
+                <option value="1">1 min</option>
+                <option value="5" selected>5 min</option>
+                <option value="15">15 min</option>
+              </select>
+            </div>
+          </section>
+
+          <section class="glass-card">
+            <h3 class="card-title">Data</h3>
+            <div class="setting-row">
+              <div>
+                <p class="setting-label">Export Data</p>
+                <p class="setting-desc">Download all usage data as JSON</p>
+              </div>
+              <button class="btn btn--ghost btn--sm" id="exportBtn">Export</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-label">Import Data</p>
+                <p class="setting-desc">Import previously exported data</p>
+              </div>
+              <label class="btn btn--ghost btn--sm import-label">
+                Import
+                <input type="file" id="importInput" accept=".json" hidden />
+              </label>
+            </div>
+            <div class="setting-row setting-row--danger">
+              <div>
+                <p class="setting-label">Reset All Data</p>
+                <p class="setting-desc">Clear all providers, entries, and settings</p>
+              </div>
+              <button class="btn btn--danger btn--sm" id="resetBtn">Reset</button>
+            </div>
+          </section>
+
+          <section class="glass-card">
+            <h3 class="card-title">About</h3>
+            <div class="about-block">
+              <p><strong>AiUsage</strong> v2.0</p>
+              <p>A comprehensive AI usage monitoring dashboard inspired by <a href="https://github.com/steipete/codexbar" target="_blank" rel="noopener">CodexBar</a>. Track token usage, costs, and quotas across 24+ AI providers in one place.</p>
+              <p>Built by <a href="https://himanshub15.github.io" target="_blank" rel="noopener">Himanshu Bhusari</a></p>
+            </div>
+          </section>
+        </div>
       </section>
     </main>
 
-    <section id="loginModal" class="login-modal" aria-hidden="true">
-      <div class="login-card">
-        <button id="loginClose" class="close-btn" aria-label="Close login">&#10005;</button>
-        <p class="mini-label">Secure login</p>
-        <h3>Sign in to AiUsage</h3>
-        <form class="login-form" id="loginForm">
-          <label for="loginEmail">Email</label>
-          <input id="loginEmail" type="email" placeholder="you@company.com" required />
-          <button type="submit" class="primary-login">Continue with Email</button>
-        </form>
-        <div class="divider"><span>or continue with</span></div>
-        <div class="social-logins">
-          <button type="button">Google</button>
-          <button type="button">Apple</button>
-          <button type="button">Passkey</button>
+    <!-- ═══════════════ ADD ENTRY MODAL ═══════════════ -->
+    <div class="modal-overlay" id="addEntryModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Log Usage Entry</h2>
+          <button class="modal-close" id="modalClose" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
+        <form id="entryForm" class="entry-form">
+          <div class="form-group">
+            <label>Provider</label>
+            <select name="provider" id="entryProvider" required></select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Model</label>
+              <input name="model" type="text" placeholder="e.g. GPT-4o, Claude Opus" />
+            </div>
+            <div class="form-group">
+              <label>Tokens</label>
+              <input name="tokens" type="number" min="0" placeholder="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cost ($)</label>
+              <input name="cost" type="number" min="0" step="0.01" placeholder="0.00" />
+            </div>
+            <div class="form-group">
+              <label>Prompts</label>
+              <input name="prompts" type="number" min="0" placeholder="0" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input name="date" type="date" id="entryDate" required />
+          </div>
+          <button type="submit" class="btn btn--primary btn--full">Add Entry</button>
+        </form>
       </div>
-    </section>
+    </div>
+
+    <!-- ═══════════════ PROVIDER DETAIL MODAL ═══════════════ -->
+    <div class="modal-overlay" id="providerDetailModal">
+      <div class="modal-card modal-card--wide">
+        <div class="modal-header">
+          <h2 id="providerDetailName">Provider</h2>
+          <button class="modal-close" id="providerDetailClose" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div id="providerDetailBody" class="provider-detail-body"></div>
+      </div>
+    </div>
 
     <script src="./script.js"></script>
   </body>
