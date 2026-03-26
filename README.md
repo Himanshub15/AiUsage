@@ -1,65 +1,93 @@
 # AiUsage
 
-> Track your AI activity in one clean dashboard. Live site: **[https://himanshub15.github.io/AiUsage/](https://himanshub15.github.io/AiUsage/)**
+> A comprehensive AI usage monitoring dashboard — track tokens, costs, and quotas across 24+ providers in one place.
 
-![GitHub Pages](https://img.shields.io/badge/Deployed-GitHub%20Pages-222222?style=for-the-badge&logo=github)
+**Live:** [ai-usage-opal.vercel.app](https://ai-usage-opal.vercel.app/) &nbsp;|&nbsp; **Mirror:** [himanshub15.github.io/AiUsage](https://himanshub15.github.io/AiUsage/)
+
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel)
+![GitHub Pages](https://img.shields.io/badge/Mirror-GitHub%20Pages-222222?style=for-the-badge&logo=github)
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-111827?style=for-the-badge&logo=javascript)
 
-## Supports
+---
 
-<img src="https://cdn.simpleicons.org/openai" alt="OpenAI" width="20" /> OpenAI &nbsp;
-<img src="https://cdn.simpleicons.org/anthropic" alt="Anthropic" width="20" /> Claude &nbsp;
-<img src="https://cdn.simpleicons.org/google" alt="Google" width="20" /> Gemini &nbsp;
-<img src="https://cdn.simpleicons.org/microsoft" alt="Microsoft" width="20" /> Copilot &nbsp;
-<img src="https://cdn.simpleicons.org/meta" alt="Meta" width="20" /> Meta AI &nbsp;
-<img src="https://cdn.simpleicons.org/huggingface" alt="Hugging Face" width="20" /> Hugging Face
+## What's New in v2.0
 
-## Highlights
+Completely rebuilt from the ground up, inspired by [CodexBar](https://github.com/steipete/codexbar). The concept is the same — monitor your AI usage — but now with the depth and polish of a real monitoring tool.
 
-- Clickable **Home month calendar** for daily AI usage tracking
-- **AI Account** integrations UI (OpenAI + Claude)
-- Sample **line analytics chart** (30d / 10d / week)
-- **Usage Calendar** with Week / Month / Year modes
-- Scrollable month overview + compact year overview
-- Minimal **daily usage bar chart**
-- Dark / Light theme toggle
-- Sidebar with outside-click close
-- Login modal UI (Email / Google / Apple / Passkey)
-- Persistent data via `localStorage`
+### Key Changes from v1.0
 
-## Screens
+| Feature | v1.0 | v2.0 |
+|---|---|---|
+| Providers | 2 (OpenAI, Claude) | **24+** (Claude, OpenAI, Gemini, Cursor, Copilot, DeepSeek, Mistral, etc.) |
+| Quota tracking | None | **Dual meters** — session + weekly limits with reset countdowns |
+| Cost tracking | None | **Per-provider cost history** with 30-day rolling charts |
+| Analytics | Sample line chart | **Full analytics suite** — cost breakdown, token usage by model, plan utilization |
+| Calendar | Click-to-mark days | **GitHub-style heatmap** with intensity levels and day detail |
+| Data model | Prompts + minutes | **Tokens, cost, model, provider, date** per entry |
+| Settings | Theme only | **Display mode, refresh interval, data export/import, reset** |
+| Design | Basic cards | **Glassmorphic dashboard** with sparklines, quota bars, area charts |
+| Navigation | Sidebar overlay | **Permanent sidebar** with icon navigation |
+| Deployment | GitHub Pages | **Vercel** (primary) + GitHub Pages (mirror) |
 
-1. **Home**
-- KPI cards
-- Big date calendar
-- Moving provider band
+---
 
-2. **AI Account**
-- Connect/disconnect keys
-- Remove key action
-- Usage trend chart
+## Supports 24+ Providers
 
-3. **Usage Calendar**
-- Week / Month / Year controls
-- Period navigation
-- Usage bar chart + stats + entry form
+<img src="https://cdn.simpleicons.org/anthropic" alt="Anthropic" width="18" /> Claude &nbsp;
+<img src="https://cdn.simpleicons.org/openai" alt="OpenAI" width="18" /> OpenAI &nbsp;
+<img src="https://cdn.simpleicons.org/google" alt="Google" width="18" /> Gemini &nbsp;
+<img src="https://cdn.simpleicons.org/github" alt="GitHub" width="18" /> Copilot &nbsp;
+<img src="https://cdn.simpleicons.org/cursor" alt="Cursor" width="18" /> Cursor &nbsp;
+Codex CLI &nbsp; Windsurf &nbsp; Kiro &nbsp; JetBrains AI &nbsp; Augment &nbsp; Amp &nbsp; Warp &nbsp; Ollama &nbsp; Perplexity &nbsp; Mistral &nbsp; DeepSeek &nbsp; Meta AI &nbsp; Poe &nbsp; Runway &nbsp; Notion AI &nbsp; OpenRouter &nbsp; xAI/Grok &nbsp; z.ai &nbsp; Kimi
 
-4. **About Us**
-- Interactive Mission / Builder / Vision panel
+## Features
+
+### Dashboard
+- KPI cards with sparklines — monthly cost, total tokens, active providers, sessions today
+- Provider status grid with dual quota bars (session + weekly)
+- 30-day cost trend area chart (30d / 14d / 7d toggles)
+- Recent entries feed
+
+### Providers
+- 24 provider cards with enable/disable toggles
+- Per-provider session and weekly quota meters with color-coded thresholds
+- Cost display and reset countdown timers
+- Category filters (Chat, IDE, Media, Other)
+- Click-to-expand detail modal with API key management
+
+### Analytics
+- Cost history area chart (daily / weekly / monthly views)
+- Provider cost breakdown with horizontal bar chart
+- Token usage by model
+- Plan utilization meters for all enabled providers
+
+### Calendar
+- GitHub-style contribution heatmap (full year)
+- 5-level color intensity based on token volume
+- Click any day to see entry breakdown
+- Monthly summary stats
+
+### Settings
+- Display mode: percentage / pace / both
+- Theme: dark / light
+- Refresh interval configuration
+- Data export (JSON) and import
+- Full data reset
 
 ## Tech
 
-- HTML
-- CSS
-- Vanilla JavaScript
-- Static deployment (GitHub Pages)
+- **HTML + CSS + Vanilla JavaScript** — zero dependencies, no build step
+- **localStorage** for persistent client-side storage
+- **SVG** charts rendered dynamically (area charts, bar charts, sparklines, heatmap)
+- **Glassmorphic UI** with CSS backdrop-filter, custom properties, and dark/light themes
+- **Fonts:** Syne (display), Be Vietnam Pro (body), JetBrains Mono (data)
 
 ## Local Run
 
 ```bash
-cd "/Users/himanshubhusari/Desktop/AiUsage"
+cd AiUsage
 python3 -m http.server 5500
 ```
 
@@ -67,17 +95,17 @@ Open `http://localhost:5500`
 
 ## Files
 
-- `index.html` - app structure
-- `styles.css` - styling + themes + responsive layout
-- `script.js` - state management + interactions + rendering
+| File | Purpose |
+|---|---|
+| `index.html` | App structure — 5 pages + 2 modals |
+| `styles.css` | Themes, glassmorphism, responsive layout, animations |
+| `script.js` | State management, 24 providers, charts, heatmap, persistence |
+| `vercel.json` | Vercel deployment config |
 
-## Roadmap
+## Inspired By
 
-- Real API usage ingestion
-- Auth backend integration
-- Provider-level analytics and filters
-- Export/share usage reports
+[CodexBar](https://github.com/steipete/codexbar) — a macOS menu bar utility that monitors token usage and rate limits across AI coding assistants. AiUsage brings the same concept to the web as a full dashboard experience.
 
 ---
 
-Built by **Himanshu Bhusari**.
+Built by **[Himanshu Bhusari](https://himanshub15.github.io)**.
